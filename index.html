@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Happy Birthday, Leang Sreylin ✨</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent1:#ff6fb7; --accent2:#ffd166; --accent3:#bde0fe;
+    --bg1:#0f1020; --bg2:#1a0b2e; --text:#f8f7ff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;overflow:hidden;font-family:"Poppins",sans-serif;color:var(--text);cursor:none;}
+
+  body{
+    background: linear-gradient(120deg,var(--bg1),var(--bg2));
+    animation: bgShift 30s ease-in-out infinite;
+  }
+  @keyframes bgShift{
+    0%{background: linear-gradient(120deg,#0f1020,#1a0b2e)}
+    50%{background: linear-gradient(120deg,#1a0b2e,#35124f)}
+    100%{background: linear-gradient(120deg,#0f1020,#1a0b2e)}
+  }
+
+  canvas{position:fixed;inset:0;pointer-events:none;z-index:1;}
+  .stage{position:relative;z-index:3;height:100%;display:grid;place-items:center;text-align:center;padding:24px;}
+  .card{background:rgba(255,255,255,0.08);backdrop-filter:blur(8px);border-radius:28px;padding:28px 36px;max-width:900px;width:min(92vw,900px);border:1px solid rgba(255,255,255,0.18);box-shadow:0 20px 60px rgba(0,0,0,0.35);}
+  .title{font-family:"Great Vibes",cursive;font-size:clamp(42px,8vw,92px);text-shadow:0 0 16px rgba(255,111,183,0.75),0 0 42px rgba(255,215,130,0.55);animation: glow 3s ease-in-out infinite;}
+  @keyframes glow{0%,100%{text-shadow:0 0 10px rgba(255,111,183,.8),0 0 30px rgba(255,215,102,.5)}50%{text-shadow:0 0 18px rgba(255,155,215,1),0 0 60px rgba(255,225,150,.7)}}
+  .date{color:rgba(255,255,255,0.7);letter-spacing:2px;text-transform:uppercase;font-weight:600;font-size:12px;}
+  .message{margin:14px auto 20px;font-size:clamp(16px,2.5vw,22px);color:#ffeefb;}
+  .btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+  .btn{appearance:none;border:none;cursor:pointer;padding:12px 18px;border-radius:999px;background:linear-gradient(135deg,var(--accent1),var(--accent2));color:white;font-weight:700;font-size:16px;box-shadow:0 10px 24px rgba(255,77,109,.35);transition:transform .12s ease,box-shadow .12s ease;animation:pulse 2s infinite;}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(255,77,109,.45);}
+  @keyframes pulse{0%,100%{transform:scale(1);box-shadow:0 10px 24px rgba(255,77,109,.35)}50%{transform:scale(1.05);box-shadow:0 14px 32px rgba(255,77,109,.5)}}
+
+  .modal{position:fixed;inset:0;display:none;place-items:center;z-index:40;}
+  .modal.active{display:grid;}
+  .overlay{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(2px);}
+  .modal-card{position:relative;z-index:1;background:rgba(255,255,255,.08);border-radius:22px;padding:26px 22px;width:min(92vw,680px);box-shadow:0 20px 60px rgba(0,0,0,.5);text-align:left;}
+  .modal-card h3{font-family:"Great Vibes",cursive;font-size:42px;margin-bottom:8px;}
+  .modal-card p{font-size:18px;line-height:1.6;color:#fff;margin-bottom:8px;}
+  .close{position:absolute;top:10px;right:12px;cursor:pointer;font-weight:800;color:#fff;background:transparent;border:none;font-size:22px;}
+</style>
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+<div class="stage">
+  <div class="card">
+    <div class="date">13 AUGUST</div>
+    <h1 class="title">Happy Birthday, <span id="name">Leang Sreylin</span> ✨</h1>
+    <p class="message" id="typed"></p>
+    <div class="btns">
+      <button class="btn" id="startBtn">✨ Let the Magic Begin ✨</button>
+      <button class="btn" id="openLetter">💌 Open My Message 💌</button>
+    </div>
+  </div>
+</div>
+<div class="modal" id="modal">
+  <div class="overlay" id="overlay"></div>
+  <div class="modal-card">
+    <button class="close" id="close">×</button>
+    <h3>For You, My Love</h3>
+    <p>On this special day, I celebrate you — your smile, your heart, and every moment we share. You are my favorite person and my forever. May your year ahead be filled with joy, health, and all the love I have for you. Happy Birthday, Sreylin. 💖</p>
+    <p>— From me, with all my heart</p>
+  </div>
+</div>
+<script>
+const message = "You are my love, my life, and my forever. Today and always, I choose you. 💞";
+const typedEl = document.getElementById('typed');
+let i=0;
+function typeNext(){ if(i<=message.length){ typedEl.textContent = message.slice(0,i++); setTimeout(typeNext,45);}}
+setTimeout(typeNext,900);
+
+const canvas=document.getElementById('bgCanvas');
+const ctx=canvas.getContext('2d');
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight;}
+addEventListener('resize',resize); resize();
+
+// Particles
+let particles=[];
+function spawnParticle(x,y,color){for(let i=0;i<60;i++){const angle=Math.random()*Math.PI*2;const speed=2+Math.random()*4;particles.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,life:60+Math.random()*30,color});}}
+function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vy+=0.03;p.life-=1;ctx.globalCompositeOperation='lighter';ctx.beginPath();ctx.arc(p.x,p.y,2,0,Math.PI*2);ctx.fillStyle=p.color;ctx.fill();if(p.life<=0)particles.splice(i,1);}requestAnimationFrame(animate);}
+animate();
+
+// Fireflies
+function spawnFireflies(count=26){for(let i=0;i<count;i++){const f=document.createElement('div');f.style.position='fixed';f.style.left=Math.random()*100+'vw';f.style.top=20+Math.random()*80+'vh';f.style.width=f.style.height='6px';f.style.borderRadius='50%';f.style.background='radial-gradient(circle,#fff 0%,#fff5 40%,transparent 70%)';f.style.boxShadow='0 0 12px 2px rgba(255,245,200,.8)';document.body.appendChild(f);setTimeout(()=>f.remove(),20000);}}
+
+// Floating Hearts
+function floatHeart(){const h=document.createElement('div');h.style.position='fixed';h.style.left=Math.random()*100+'vw';h.style.bottom='-50px';h.style.width=h.style.height=14+Math.random()*16+'px';h.style.background='pink';h.style.borderRadius='50%';h.style.opacity=0.8;document.body.appendChild(h);setTimeout(()=>h.remove(),12000);}
+setInterval(floatHeart,300);
+
+// Modal
+const modal=document.getElementById('modal');const overlay=document.getElementById('overlay');document.getElementById('openLetter').onclick=()=>modal.classList.add('active');document.getElementById('close').onclick=()=>modal.classList.remove('active');overlay.onclick=()=>modal.classList.remove('active');
+
+// Start button
+const startBtn=document.getElementById('startBtn');startBtn.addEventListener('click',()=>{
+  spawnFireflies();
+  spawnParticle(innerWidth/2,innerHeight/2,'#ff6fb7');
+});
+
+// Cursor trail
+document.addEventListener('mousemove',e=>{const h=document.createElement('div');h.style.position='fixed';h.style.left=e.clientX+'px';h.style.top=e.clientY+'px';h.style.width=h.style.height='12px';h.style.background='pink';h.style.borderRadius='50%';document.body.appendChild(h);setTimeout(()=>h.remove(),1000);});
+</script>
+</body>
+</html>
